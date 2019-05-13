@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>bauprofiler</groupId>
+    <artifactId>bauprofiler</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>BAUProfiler</name>
+    <description>BAUProfiler is a profiling framework for Java</description>
+    <inceptionYear>2019</inceptionYear>
+
+    <prerequisites>
+        <maven>3.1.0</maven>
+    </prerequisites>
+
+    <properties>
+        <bauprofilerVersion>1.0.0</bauprofilerVersion>
+        <jdkVersion>1.8</jdkVersion>
+        <junitVersion>4.12</junitVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junitVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>1.11.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>bauprofiler-api</module>
+        <module>bauprofiler-annotations</module>
+        <module>bauprofiler-annotations-processors</module>
+        <module>dist</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <fail>true</fail>
+                            <rules>
+                                <requireMavenVersion>
+                                    <!-- Some plugin features require a recent Maven runtime to work properly -->
+                                    <message>Current version of Maven ${maven.version} required to build the project
+                                        should be ${project.prerequisites.maven}, or higher!
+                                    </message>
+                                    <version>[${project.prerequisites.maven},)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <message>Current JDK version ${java.version} should be ${jdkVersion}, or higher!
+                                    </message>
+                                    <version>${jdkVersion}</version>
+                                </requireJavaVersion>
+                                <requireNoRepositories>
+                                    <message>Best Practice is to never define repositories in pom.xml (use a repository
+                                        manager instead).
+                                    </message>
+                                </requireNoRepositories>
+                                <requireReleaseDeps>
+                                    <message>No Snapshots Dependencies Allowed!</message>
+                                </requireReleaseDeps>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.5.1</version>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <source>${jdkVersion}</source>
+                        <target>${jdkVersion}</target>
+                        <testSource>${jdkVersion}</testSource>
+                        <testTarget>${jdkVersion}</testTarget>
+                        <compilerVersion>1.8</compilerVersion>
+                        <showDeprecation>true</showDeprecation>
+                        <showWarnings>true</showWarnings>
+                        <debug>false</debug>
+                        <fork>true</fork>
+                        <compilerArgs>
+                            <arg>-Xlint:unchecked</arg>
+                            <arg>-proc:none</arg>
+                        </compilerArgs>
+                        <maxmem>128m</maxmem>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.1.1</version>
+                    <executions>
+                        <execution>
+                            <id>distro-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                            <configuration>
+                                <descriptors>
+                                    <descriptor>src/assembly/bin.xml</descriptor>
+                                </descriptors>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
