@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>bauprofiler</groupId>
+    <groupId>uk.ac.manchester.bauprofiler</groupId>
     <artifactId>bauprofiler</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -13,13 +13,14 @@
     <inceptionYear>2019</inceptionYear>
 
     <prerequisites>
-        <maven>3.1.0</maven>
+        <maven>3.6.0</maven>
     </prerequisites>
 
     <properties>
         <bauprofilerVersion>1.0.0</bauprofilerVersion>
         <jdkVersion>1.8</jdkVersion>
         <junitVersion>4.12</junitVersion>
+        <jacocoVersion>0.8.4</jacocoVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -33,6 +34,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>de.bechte.junit</groupId>
+                <artifactId>junit-hierarchicalcontextrunner</artifactId>
+                <version>4.12.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
                 <version>1.11.1</version>
@@ -41,10 +48,8 @@
     </dependencyManagement>
 
     <modules>
-        <module>bauprofiler-api</module>
-        <module>bauprofiler-annotations</module>
-        <module>bauprofiler-annotations-processors</module>
-        <module>dist</module>
+        <module>bauprofiler-core</module>
+        <module>bauprofiler-json</module>
     </modules>
 
     <build>
@@ -108,29 +113,14 @@
                         <fork>true</fork>
                         <compilerArgs>
                             <arg>-Xlint:unchecked</arg>
-                            <arg>-proc:none</arg>
                         </compilerArgs>
                         <maxmem>128m</maxmem>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.1</version>
-                    <executions>
-                        <execution>
-                            <id>distro-assembly</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                            <configuration>
-                                <descriptors>
-                                    <descriptor>src/assembly/bin.xml</descriptor>
-                                </descriptors>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacocoVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
