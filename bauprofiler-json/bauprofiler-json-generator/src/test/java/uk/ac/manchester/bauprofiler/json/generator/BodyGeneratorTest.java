@@ -206,11 +206,11 @@ public class BodyGeneratorTest {
 	container.invisibleFields = 1;
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> includeInvisible =
+	Optional<FieldSpec> excludeInvisible =
 	    filterFieldsByName(bodyGen.getFields(), "_excludeInvisible");
 
-	assertTrue(includeInvisible.isPresent());
-	assertThat(includeInvisible.get().toString(), equalTo(
+	assertTrue(excludeInvisible.isPresent());
+	assertThat(excludeInvisible.get().toString(), equalTo(
 		    "private final java.lang.String _excludeInvisible = "
 		    +escape("\"name\":\"%s\"")
 		    +";\n"));
@@ -229,11 +229,11 @@ public class BodyGeneratorTest {
 	container.invisibleChildFields = 1;
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> includeInvisible =
+	Optional<FieldSpec> excludeInvisible =
 	    filterFieldsByName(bodyGen.getFields(), "_excludeInvisible");
 
-	assertTrue(includeInvisible.isPresent());
-	assertThat(includeInvisible.get().toString(), equalTo(
+	assertTrue(excludeInvisible.isPresent());
+	assertThat(excludeInvisible.get().toString(), equalTo(
 		    "private final java.lang.String _excludeInvisible = "
 		    +escape("\"name\":\"%s\",\"child\":{\"childName\":\"%s\"")
 		    +";\n"));
