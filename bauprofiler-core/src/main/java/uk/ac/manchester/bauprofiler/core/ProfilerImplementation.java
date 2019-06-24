@@ -102,7 +102,7 @@ public class ProfilerImplementation extends Profiler {
     private void dispatchCachedProfilesToGroup(Link link, long groupId) {
         if (cachedProfiles.containsKey(link))
             for (ConvertableProfile p : cachedProfiles.get(link))
-                dispatchProfileToGroup(p, groupId);
+                dispatchProfileToGroupWithVerbosity(p, groupId);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class ProfilerImplementation extends Profiler {
             return;
 
         if (isAttached(groupId))
-            dispatchProfileToGroup(profile, groupId);
+            dispatchProfileToGroupWithVerbosity(profile, groupId);
         else if (isHardLinked(groupId))
             cacheProfile(profile, getHardLink(groupId));
         else if (isNotEmptyLink(softLink))
@@ -153,8 +153,13 @@ public class ProfilerImplementation extends Profiler {
         return disabledGroupIds.contains(groupId);
     }
 
-    private void dispatchProfileToGroup(ConvertableProfile profile, long groupId) {
+    private void dispatchProfileToGroupWithVerbosity(ConvertableProfile profile, long groupId) {
+        setProfileVerbosity(profile);
         dispatcher.dispatchProfileToGroup(profile, groupId);
+    }
+
+    private void setProfileVerbosity(ConvertableProfile profile) {
+        profile.setVerbosity(Profiler.VERBOSE);
     }
 
     private boolean isHardLinked(long groupId) {

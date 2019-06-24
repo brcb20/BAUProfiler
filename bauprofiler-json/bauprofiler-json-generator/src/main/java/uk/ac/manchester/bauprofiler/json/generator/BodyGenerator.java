@@ -64,7 +64,7 @@ public class BodyGenerator {
         return FieldSpec.builder(ArrayTypeName.of(ClassName.get(
 			"uk.ac.manchester.bauprofiler.core.assembler"
 			, "AssemblyNode"))
-		, "assemblyNodes")
+		, "_assemblyNodes")
             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
             .initializer(getAssemblyNodesFormat(), getAssemblyNodesArgs())
             .build();
@@ -113,7 +113,7 @@ public class BodyGenerator {
 
     private FieldSpec createIncludeInvisibleField() {
 	return createInvisibleField(
-		"includeInvisible", container.fields, container.childFields);
+		"_includeInvisible", container.fields, container.childFields);
     }
 
     private FieldSpec createInvisibleField(String name, Field[] fields, Field[] childFields) {
@@ -189,7 +189,7 @@ public class BodyGenerator {
 
     private FieldSpec createExcludeInvisibleField() {
 	return createInvisibleField(
-		"excludeInvisible"
+		"_excludeInvisible"
 		, filterInvisible(container.fields, container.invisibleFields)
 		, filterInvisible(container.childFields, container.invisibleChildFields));
     }
@@ -206,7 +206,7 @@ public class BodyGenerator {
     }
 
     private FieldSpec createVerboseField() {
-        return FieldSpec.builder(boolean.class, "verbose")
+        return FieldSpec.builder(boolean.class, "_verbose")
             .addModifiers(Modifier.PRIVATE)
             .initializer("$L", "false")
             .build();
@@ -224,7 +224,7 @@ public class BodyGenerator {
 
     private MethodSpec createGetJsonIncludeInvisible() {
 	return createGetJsonInvisible(
-		"includeInvisible", container.fields, container.childFields);
+		"_includeInvisible", container.fields, container.childFields);
     }
 
     private MethodSpec createGetJsonInvisible(
@@ -237,7 +237,7 @@ public class BodyGenerator {
     }
 
     private String buildGetJsonMethodName(String format) {
-	return "getJson"+format.substring(0,1).toUpperCase()+format.substring(1);
+	return "getJson"+format.substring(1,2).toUpperCase()+format.substring(2);
     }
 
     private String buildGetJsonInvisibleStatement(
@@ -252,7 +252,7 @@ public class BodyGenerator {
 
     private MethodSpec createGetJsonExcludeInvisible() {
 	return createGetJsonInvisible(
-		"excludeInvisible"
+		"_excludeInvisible"
 		, filterInvisible(container.fields, container.invisibleFields)
 		, filterInvisible(container.childFields, container.invisibleChildFields));
     }
@@ -266,7 +266,7 @@ public class BodyGenerator {
     }
 
     private String buildGetJsonStatement() {
-	return "return (verbose) ? getJsonIncludeInvisible() : getJsonExcludeInvisible()";
+	return "return (_verbose) ? getJsonIncludeInvisible() : getJsonExcludeInvisible()";
     }
 
     private MethodSpec createSetVerbosityMethod() {
@@ -274,7 +274,7 @@ public class BodyGenerator {
 	    .addModifiers(Modifier.PUBLIC)
 	    .addParameter(TypeName.BOOLEAN, "verbose")
 	    .returns(TypeName.VOID)
-	    .addStatement("this.verbose = verbose")
+	    .addStatement("this._verbose = verbose")
 	    .build();
     }
 
@@ -287,7 +287,7 @@ public class BodyGenerator {
     }
 
     private String getConvertStatementFormat() {
-	return "return new $T("+encoder.nextConversionID()+", getJson(), assemblyNodes)";
+	return "return new $T("+encoder.nextConversionID()+", getJson(), _assemblyNodes)";
     }
 
     private Object[] getConvertStatementArgs() {
