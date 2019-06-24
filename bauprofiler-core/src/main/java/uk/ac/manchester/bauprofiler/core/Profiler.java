@@ -58,8 +58,6 @@ public abstract class Profiler {
             settings.getProperty("profiler.output.prettyprint", "false"));
     public static final boolean VERBOSE = Boolean.parseBoolean(
             settings.getProperty("profiler.output.verbose", "false"));
-    public static final boolean DEBUG = Boolean.parseBoolean(
-            settings.getProperty("profiler.debug", "false"));
 
     private static final Profiler instance;
 
