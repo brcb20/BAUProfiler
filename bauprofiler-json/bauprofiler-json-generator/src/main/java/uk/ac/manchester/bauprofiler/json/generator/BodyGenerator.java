@@ -94,8 +94,12 @@ public class BodyGenerator {
     private List<Object> getAssemblyNodeArgs(JType type, int nodeIndex) {
 	return Arrays.asList(
 		getNodeClassForType(type)
-		, container.prefixes[nodeIndex]
+		, escape(container.prefixes[nodeIndex])
 		, encoder.encodePrefix(container.prefixes[nodeIndex]));
+    }
+
+    private String escape(String unescaped) {
+	return CodeBlock.of("$S", unescaped).toString();
     }
 
     private List<Object> getChildAssemblyNodeArgs() {
@@ -103,7 +107,7 @@ public class BodyGenerator {
 	return Arrays.asList(
 		ChildNode.class
 		, childNode.getClass()
-		, childNode.prefix()
+		, ""
 		, encoder.encodePrefix(childNode.prefix()));
     }
 
