@@ -29,6 +29,7 @@ import java.util.Set;
 import java.io.IOException;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.Filer;
@@ -36,9 +37,11 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.auto.service.AutoService;
 
 import uk.ac.manchester.bauprofiler.json.annotations.JClass;
 
+@AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
     private Filer filer;
 

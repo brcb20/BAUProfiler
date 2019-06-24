@@ -44,16 +44,15 @@
             <groupId>com.google.collections</groupId>
             <artifactId>google-collections</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.0-rc5</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <targetPath>META-INF/services</targetPath>
-                <filtering>false</filtering>
-                <directory>${basedir}/src/main/resources/META-INF/services</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
