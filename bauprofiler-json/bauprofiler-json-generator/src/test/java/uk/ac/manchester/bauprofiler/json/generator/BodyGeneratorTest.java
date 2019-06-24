@@ -119,7 +119,7 @@ public class BodyGeneratorTest {
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
 		    +"[] _assemblyNodes = {new "
 		    +JSON_CORE_PACKAGE
-		    +".ObjectNode(\"object\", 0)};\n"));
+		    +".ObjectNode("+escape("\"object\"")+", 0)};\n"));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class BodyGeneratorTest {
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
 		    +"[] _assemblyNodes = {new "
 		    +JSON_CORE_PACKAGE
-		    +".ObjectArrayNode(\"objectArray\", 0)};\n"));
+		    +".ObjectArrayNode("+escape("\"objectArray\"")+", 0)};\n"));
     }
 
     @Test
@@ -153,9 +153,9 @@ public class BodyGeneratorTest {
 		    "private final "
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
 		    +"[] _assemblyNodes = "
-		    +"{new "+JSON_CORE_PACKAGE+".ObjectNode(\"object\", 0)"
+		    +"{new "+JSON_CORE_PACKAGE+".ObjectNode("+escape("\"object\"")+", 0)"
 		    +", new "+JSON_CORE_PACKAGE+".ChildNode("
-		    +"new "+JSON_CORE_PACKAGE+".ArrayNode(\"childArray\", 0))};\n"));
+		    +"new "+JSON_CORE_PACKAGE+".ArrayNode(\"\", 0))};\n"));
     }
 
     @Test
