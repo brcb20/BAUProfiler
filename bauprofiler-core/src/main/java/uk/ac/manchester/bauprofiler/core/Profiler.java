@@ -53,7 +53,7 @@ public abstract class Profiler {
 
     /* Default configuration (help me help you) */
     public static final String ASSEMBLER_FACTORY_PARAMS = settings.getProperty(
-            "profiler.params.assembler.factory");
+            "profiler.params.assembler.factory", "");
     public static final boolean PRETTY_PRINT = Boolean.parseBoolean(
             settings.getProperty("profiler.output.prettyprint", "false"));
     public static final boolean VERBOSE = Boolean.parseBoolean(
