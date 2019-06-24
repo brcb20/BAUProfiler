@@ -96,13 +96,13 @@ public class BodyGeneratorTest {
     public void testAssemblyNodeGen_ForEmptyPrefixes() {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "assemblyNodes");
+	Optional<FieldSpec> assemblyNodes =filterFieldsByName(bodyGen.getFields(), "_assemblyNodes");
 
 	assertTrue(assemblyNodes.isPresent());
 	assertThat(assemblyNodes.get().toString(), equalTo(
 		    "private final "
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
-		    +"[] assemblyNodes = {};\n"));
+		    +"[] _assemblyNodes = {};\n"));
     }
 
     @Test
@@ -111,13 +111,13 @@ public class BodyGeneratorTest {
 	container.type = JType.OBJECT;
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "assemblyNodes");
+	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "_assemblyNodes");
 
 	assertTrue(assemblyNodes.isPresent());
 	assertThat(assemblyNodes.get().toString(), equalTo(
 		    "private final "
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
-		    +"[] assemblyNodes = {new "
+		    +"[] _assemblyNodes = {new "
 		    +JSON_CORE_PACKAGE
 		    +".ObjectNode(\"object\", 0)};\n"));
     }
@@ -128,13 +128,13 @@ public class BodyGeneratorTest {
 	container.type = JType.OBJECT_ARRAY;
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "assemblyNodes");
+	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "_assemblyNodes");
 
 	assertTrue(assemblyNodes.isPresent());
 	assertThat(assemblyNodes.get().toString(), equalTo(
 		    "private final "
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
-		    +"[] assemblyNodes = {new "
+		    +"[] _assemblyNodes = {new "
 		    +JSON_CORE_PACKAGE
 		    +".ObjectArrayNode(\"objectArray\", 0)};\n"));
     }
@@ -146,13 +146,13 @@ public class BodyGeneratorTest {
 	container.childNode = Optional.of(new ArrayNode("childArray", 0));
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
-	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "assemblyNodes");
+	Optional<FieldSpec> assemblyNodes = filterFieldsByName(bodyGen.getFields(), "_assemblyNodes");
 
 	assertTrue(assemblyNodes.isPresent());
 	assertThat(assemblyNodes.get().toString(), equalTo(
 		    "private final "
 		    +FULLY_QUALIFIED_NAME_ASSEMBLYNODE
-		    +"[] assemblyNodes = "
+		    +"[] _assemblyNodes = "
 		    +"{new "+JSON_CORE_PACKAGE+".ObjectNode(\"object\", 0)"
 		    +", new "+JSON_CORE_PACKAGE+".ChildNode("
 		    +"new "+JSON_CORE_PACKAGE+".ArrayNode(\"childArray\", 0))};\n"));
@@ -168,11 +168,11 @@ public class BodyGeneratorTest {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
 	Optional<FieldSpec> includeInvisible =
-	    filterFieldsByName(bodyGen.getFields(), "includeInvisible");
+	    filterFieldsByName(bodyGen.getFields(), "_includeInvisible");
 
 	assertTrue(includeInvisible.isPresent());
 	assertThat(includeInvisible.get().toString(), equalTo(
-		    "private final java.lang.String includeInvisible = "
+		    "private final java.lang.String _includeInvisible = "
 		    +escape("\"name\":\"%s\",\"secondName\":\"%s\"")
 		    +";\n"));
     }
@@ -188,11 +188,11 @@ public class BodyGeneratorTest {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
 	Optional<FieldSpec> includeInvisible =
-	    filterFieldsByName(bodyGen.getFields(), "includeInvisible");
+	    filterFieldsByName(bodyGen.getFields(), "_includeInvisible");
 
 	assertTrue(includeInvisible.isPresent());
 	assertThat(includeInvisible.get().toString(), equalTo(
-		    "private final java.lang.String includeInvisible = "
+		    "private final java.lang.String _includeInvisible = "
 		    +escape("\"child\":{\"childName\":\"%s\",\"secondChildName\":\"%s\"")
 		    +";\n"));
     }
@@ -207,11 +207,11 @@ public class BodyGeneratorTest {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
 	Optional<FieldSpec> includeInvisible =
-	    filterFieldsByName(bodyGen.getFields(), "excludeInvisible");
+	    filterFieldsByName(bodyGen.getFields(), "_excludeInvisible");
 
 	assertTrue(includeInvisible.isPresent());
 	assertThat(includeInvisible.get().toString(), equalTo(
-		    "private final java.lang.String excludeInvisible = "
+		    "private final java.lang.String _excludeInvisible = "
 		    +escape("\"name\":\"%s\"")
 		    +";\n"));
     }
@@ -230,11 +230,11 @@ public class BodyGeneratorTest {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
 	Optional<FieldSpec> includeInvisible =
-	    filterFieldsByName(bodyGen.getFields(), "excludeInvisible");
+	    filterFieldsByName(bodyGen.getFields(), "_excludeInvisible");
 
 	assertTrue(includeInvisible.isPresent());
 	assertThat(includeInvisible.get().toString(), equalTo(
-		    "private final java.lang.String excludeInvisible = "
+		    "private final java.lang.String _excludeInvisible = "
 		    +escape("\"name\":\"%s\",\"child\":{\"childName\":\"%s\"")
 		    +";\n"));
     }
@@ -255,7 +255,7 @@ public class BodyGeneratorTest {
 	assertTrue(getJsonIncludeInvisible.isPresent());
 	assertThat(getJsonIncludeInvisible.get().toString(), equalTo(
 		    "private java.lang.String getJsonIncludeInvisible() {\n"
-		    + "  return String.format(includeInvisible, name, nextName);\n"
+		    + "  return String.format(_includeInvisible, name, nextName);\n"
 		    + "}\n"));
     }
 
@@ -280,7 +280,7 @@ public class BodyGeneratorTest {
 	assertThat(getJsonIncludeInvisible.get().toString(), equalTo(
 		    "private java.lang.String getJsonIncludeInvisible() {\n"
 		    + "  return String.format("
-		    + "includeInvisible, name, childName, nextChildName);\n"
+		    + "_includeInvisible, name, childName, nextChildName);\n"
 		    + "}\n"));
     }
 
@@ -300,7 +300,7 @@ public class BodyGeneratorTest {
 	assertTrue(getJsonExcludeInvisible.isPresent());
 	assertThat(getJsonExcludeInvisible.get().toString(), equalTo(
 		    "private java.lang.String getJsonExcludeInvisible() {\n"
-		    + "  return String.format(excludeInvisible, name);\n"
+		    + "  return String.format(_excludeInvisible, name);\n"
 		    + "}\n"));
     }
 
@@ -325,7 +325,7 @@ public class BodyGeneratorTest {
 	assertThat(getJsonExcludeInvisible.get().toString(), equalTo(
 		    "private java.lang.String getJsonExcludeInvisible() {\n"
 		    + "  return String.format("
-		    + "excludeInvisible, name, childName);\n"
+		    + "_excludeInvisible, name, childName);\n"
 		    + "}\n"));
     }
 
@@ -339,7 +339,7 @@ public class BodyGeneratorTest {
 	assertTrue(getJson.isPresent());
 	assertThat(getJson.get().toString(), equalTo(
 		    "private java.lang.String getJson() {\n"
-		    + "  return (verbose) "
+		    + "  return (_verbose) "
 		    + "? getJsonIncludeInvisible() : getJsonExcludeInvisible();\n"
 		    + "}\n"));
     }
@@ -349,10 +349,10 @@ public class BodyGeneratorTest {
 	BodyGenerator bodyGen = new BodyGenerator(container, new DummyEncoder());
 
 	Optional<FieldSpec> verbose =
-	    filterFieldsByName(bodyGen.getFields(), "verbose");
+	    filterFieldsByName(bodyGen.getFields(), "_verbose");
 
 	assertTrue(verbose.isPresent());
-	assertThat(verbose.get().toString(), equalTo("private boolean verbose = false;\n"));
+	assertThat(verbose.get().toString(), equalTo("private boolean _verbose = false;\n"));
     }
 
     @Test
@@ -365,7 +365,7 @@ public class BodyGeneratorTest {
 	assertTrue(verbosity.isPresent());
 	assertThat(verbosity.get().toString(), equalTo(
 		    "public void setVerbosity(boolean verbose) {\n"
-		    +"  this.verbose = verbose;\n"
+		    +"  this._verbose = verbose;\n"
 		    +"}\n"));
     }
 
@@ -380,7 +380,7 @@ public class BodyGeneratorTest {
 	assertThat(convert.get().toString(), equalTo(
 		    "public "+FULLY_QUALIFIED_NAME_CONVERSION+" convert() {\n"
 		    + "  return new "+JSON_GENERATOR_PACKAGE+".JsonConversion("
-		    + "0, getJson(), assemblyNodes);\n"
+		    + "0, getJson(), _assemblyNodes);\n"
 		    + "}\n"));
     }
 }
