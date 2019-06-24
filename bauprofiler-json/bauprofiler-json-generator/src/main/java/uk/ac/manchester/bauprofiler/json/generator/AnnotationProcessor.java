@@ -98,7 +98,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-	return ImmutableSet.of("uk.ac.manchester.bauprofiler.json.annotations.JClass");
+	return ImmutableSet.of(JClass.class.getName());
     }
 
     @Override
