@@ -37,11 +37,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.auto.service.AutoService;
 
 import uk.ac.manchester.bauprofiler.json.annotations.JClass;
 
-@AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor {
     private Filer filer;
 
