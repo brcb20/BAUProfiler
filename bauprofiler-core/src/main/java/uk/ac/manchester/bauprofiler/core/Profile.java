@@ -27,7 +27,8 @@ package uk.ac.manchester.bauprofiler.core;
 
 import uk.ac.manchester.bauprofiler.core.interfaces.*;
 
-public interface Profile<T extends Profile> extends PostProcess, Invalidate, Dependency<T> {
+public interface Profile<T extends Profile> extends Processable, Invalidate, Dependency<T> {
+   default void preProcess() {}
    default void postProcess() {}
    default boolean invalidate() { return false; }
    default boolean predicate(T dep) { return false; }
