@@ -11,7 +11,7 @@ BAUProfiler is a profiling framework for Java applications based on the profilin
 - Optional cached profiling requests added to a given group (at a later time) or shared between multiple groups
 - Profiling call args are instances of user-defined classes that extend ConvertableProfile
 - User-defined classes allow for a mix of logging and profiling
-- Optional return of timer instance from profiling call, also passed to user-defined class, allowing for information extraction during [iiii] (see below)
+- Optional return of timer instance from profiling call, also passed to user-defined class, allowing for information extraction during [iv] (see below)
 - User-defined classes implement methods used by the profiler to:
    1. Perform preprocessing (alternative to processing in constructor)
    2. Invalidate requests
