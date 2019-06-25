@@ -25,6 +25,7 @@
  */
 package uk.ac.manchester.bauprofiler.core.interfaces;
 
-public interface PostProcess {
-   public void postProcess();
+public interface Processable {
+   void preProcess();
+   void postProcess();
 }
