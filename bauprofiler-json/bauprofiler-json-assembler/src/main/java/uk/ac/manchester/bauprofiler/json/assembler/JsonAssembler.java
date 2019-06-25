@@ -137,7 +137,7 @@ public class JsonAssembler implements Assembler {
         }
 
         private boolean isMatchingConversion() {
-            return depthTree.size() > 0
+            return conversionIds.size() > 0
                 && conversionIds.peekLast() == conversionID;
         }
 
