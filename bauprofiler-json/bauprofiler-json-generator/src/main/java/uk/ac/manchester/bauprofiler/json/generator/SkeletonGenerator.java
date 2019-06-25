@@ -86,12 +86,16 @@ public class SkeletonGenerator {
     }
 
     private ClassName getDependencyClass() {
+	return getPrefixedDependencyClass("");
+    }
+
+    private ClassName getPrefixedDependencyClass(String classNamePrefix) {
 	String fullyQualifiedName = container.fullyQualifiedTypeArgName.get();
 	String packageName = extractPackageName(fullyQualifiedName);
 	String className = extractClassName(fullyQualifiedName);
 	return ClassName.get(
 		packageName.isEmpty() ? container.packageName : packageName
-		, className);
+		, classNamePrefix+className);
     }
 
     private String extractPackageName(String fullyQualifiedName) {
@@ -130,7 +134,7 @@ public class SkeletonGenerator {
     }
 
     private MethodSpec getDependsMethod() {
-	ClassName dependencyClass = getDependencyClass();
+	ClassName dependencyClass = getPrefixedDependencyClass(CLASS_NAME_PREFIX);
 	return MethodSpec.methodBuilder("depends")
 	    .addModifiers(Modifier.PUBLIC)
 	    .addStatement("return $T.class", dependencyClass)
