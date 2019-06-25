@@ -25,13 +25,14 @@
  */
 package uk.ac.manchester.bauprofiler.core;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
 import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 
 public class ProfileQueueBuilderSelector {
-    private final HashMap<Long, OrderedProfileQueue.Builder> selector = new HashMap<>();
+    private final Map<Long, OrderedProfileQueue.Builder> selector = new Hashtable<>();
 
     private Long reference = null;
     private OrderedProfileQueue.Builder selected = null;
