@@ -102,7 +102,7 @@ public class ProfilerImplementation extends Profiler {
     private void dispatchCachedProfilesToGroup(Link link, long groupId) {
         if (cachedProfiles.containsKey(link))
             for (ConvertableProfile p : cachedProfiles.get(link))
-                dispatchPreparedProfileToGroup(p, groupId);
+                dispatchProfileToGroup(p, groupId);
     }
 
     @Override
@@ -133,16 +133,18 @@ public class ProfilerImplementation extends Profiler {
 
     @Override
     public void profile(ConvertableProfile profile, long groupId) {
-        dispatchOrCacheProfile(profile, groupId, EMPTY_LINK);
+        dispatchOrCachePreparedProfile(profile, groupId, EMPTY_LINK);
     }
 
-    private <T> void dispatchOrCacheProfile(
+    private <T> void dispatchOrCachePreparedProfile(
             ConvertableProfile profile, long groupId, T softLink) {
         if (isDisabled(groupId))
             return;
 
+        prepareProfile(profile);
+
         if (isAttached(groupId))
-            dispatchPreparedProfileToGroup(profile, groupId);
+            dispatchProfileToGroup(profile, groupId);
         else if (isHardLinked(groupId))
             cacheProfile(profile, getHardLink(groupId));
         else if (isNotEmptyLink(softLink))
@@ -153,8 +155,7 @@ public class ProfilerImplementation extends Profiler {
         return disabledGroupIds.contains(groupId);
     }
 
-    private void dispatchPreparedProfileToGroup(ConvertableProfile profile, long groupId) {
-        prepareProfile(profile);
+    private void dispatchProfileToGroup(ConvertableProfile profile, long groupId) {
         dispatcher.dispatchProfileToGroup(profile, groupId);
     }
 
@@ -193,7 +194,7 @@ public class ProfilerImplementation extends Profiler {
         if (softLink == null)
             throw new NullPointerException();
 
-        dispatchOrCacheProfile(profile, groupId, softLink);
+        dispatchOrCachePreparedProfile(profile, groupId, softLink);
     }
 
     public static class AttachException extends RuntimeException {
