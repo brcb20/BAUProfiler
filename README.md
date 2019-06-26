@@ -17,6 +17,7 @@ BAUProfiler is a profiling framework for Java applications based on the profilin
    2. Invalidate requests
    3. Order requests based on dependencies
    4. Finalize field values prior to conversion to the desired output format
+- Provides a synchronisation point, prior to which the user-defined class can be externally (directly by the user) or internally (using methods [i] or [iv] above) modified, and after which the final conversion to the desired output format occurs. 
 - Pluggable output format with JSON plugin provided
 
 #### JSON plugin
