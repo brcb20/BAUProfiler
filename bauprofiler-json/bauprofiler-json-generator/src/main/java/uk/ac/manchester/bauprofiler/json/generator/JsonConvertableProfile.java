@@ -30,7 +30,7 @@ import java.util.StringJoiner;
 import uk.ac.manchester.bauprofiler.core.Profile;
 import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 
-public interface JsonConvertableProfile<T extends Profile> extends ConvertableProfile<T> {
+public interface JsonConvertableProfile extends ConvertableProfile {
     static String arrayToString(String[] array) {
 	StringJoiner sj = new StringJoiner(",", "[", "]");
 	for (String e : array)

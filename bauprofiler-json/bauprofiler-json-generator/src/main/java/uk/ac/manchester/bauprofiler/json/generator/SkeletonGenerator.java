@@ -40,12 +40,15 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.AnnotationSpec;
+
+import uk.ac.manchester.bauprofiler.core.Profile;
+import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 
 public class SkeletonGenerator {
     private final String CLASS_NAME_PREFIX = "Generated";
-    private final ClassName superinterface = ClassName.get(
-	    "uk.ac.manchester.bauprofiler.json.generator", "JsonConvertableProfile");
+    private final ClassName superinterface = ClassName.get(JsonConvertableProfile.class);
     private ProfileContainer container;
 
     public SkeletonGenerator(ProfileContainer container) {
@@ -69,7 +72,7 @@ public class SkeletonGenerator {
     private AnnotationSpec getGeneratedAnnotation() {
 	return AnnotationSpec.builder(Generated.class)
 	    .addMember("value", "$S"
-		    , "uk.ac.manchester.bauprofiler.json.generator.CodeGenerator")
+		    , CodeGenerator.class.getName())
 	    .addMember("date", "$S", LocalDateTime.now())
 	    .build();
     }
@@ -79,18 +82,11 @@ public class SkeletonGenerator {
     }
 
     public TypeName getSuperInterface() {
-	return (container.fullyQualifiedTypeArgName.isPresent())
-	    ? ParameterizedTypeName.get(
-		    superinterface, getDependencyClass())
-	    : superinterface;
-    }
-
-    private ClassName getDependencyClass() {
-	return getPrefixedDependencyClass("");
+	return superinterface;
     }
 
     private ClassName getPrefixedDependencyClass(String classNamePrefix) {
-	String fullyQualifiedName = container.fullyQualifiedTypeArgName.get();
+	String fullyQualifiedName = container.fullyQualifiedDependencyName.get();
 	String packageName = extractPackageName(fullyQualifiedName);
 	String className = extractClassName(fullyQualifiedName);
 	return ClassName.get(
@@ -128,17 +124,40 @@ public class SkeletonGenerator {
 
     public MethodSpec[] getMethods() {
 	List<MethodSpec> methods = new ArrayList<>();
-	if (container.fullyQualifiedTypeArgName.isPresent())
-	    methods.add(getDependsMethod());
+	methods.add(getDependsMethod());
+	if (!container.fullyQualifiedDependencyName.isPresent())
+	    methods.add(getDefaultPredicateMethod());
 	return methods.toArray(new MethodSpec[methods.size()]);
     }
 
     private MethodSpec getDependsMethod() {
-	ClassName dependencyClass = getPrefixedDependencyClass(CLASS_NAME_PREFIX);
 	return MethodSpec.methodBuilder("depends")
 	    .addModifiers(Modifier.PUBLIC)
-	    .addStatement("return $T.class", dependencyClass)
-	    .returns(ParameterizedTypeName.get(ClassName.get(Class.class), dependencyClass))
+	    .addStatement(getDependsMethodStatement())
+	    .returns(ParameterizedTypeName.get(ClassName.get(Class.class), ClassName.get(ConvertableProfile.class)))
+	    .build();
+    }
+
+    private CodeBlock getDependsMethodStatement() {
+	return (container.fullyQualifiedDependencyName.isPresent())
+	    ? getCustomDependsMethodStatement()
+	    : getDefaultDependsMethodStatement();
+    }
+
+    private CodeBlock getCustomDependsMethodStatement() {
+	return CodeBlock.of("return $T.class", getPrefixedDependencyClass(CLASS_NAME_PREFIX));
+    }
+
+    private CodeBlock getDefaultDependsMethodStatement() {
+	return CodeBlock.of("return null");
+    }
+
+    private MethodSpec getDefaultPredicateMethod() {
+	return MethodSpec.methodBuilder("predicate")
+	    .addModifiers(Modifier.PUBLIC)
+	    .addParameter(ClassName.get(Profile.class), "dep")
+	    .addStatement("return false")
+	    .returns(TypeName.BOOLEAN)
 	    .build();
     }
 }

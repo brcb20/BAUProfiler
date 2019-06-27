@@ -66,9 +66,9 @@ public class AnnotationExtractor {
 	populateJClassInfo();
 	populateChildInfo();
 	filterFields();
-	checkHasJFields();
-	checkFilteredFieldsHaveProtectedModifier();
-	checkChildInfoMatchesChildFields();
+	guaranteeHasJFields();
+	guaranteeFilteredFieldsHaveProtectedModifier();
+	guaranteeChildInfoMatchesChildFields();
 	populateFieldInfo();
 	populateChildFieldInfo();
 	populateInvisibleInfo();
@@ -140,12 +140,12 @@ public class AnnotationExtractor {
 	return field.getAnnotation(ChildField.class) != null;
     }
 
-    private void checkHasJFields() {
+    private void guaranteeHasJFields() {
 	if (fields.size() == 0 && childFields.size() == 0)
 	    throw new MissingJFieldAnnotationsException();
     }
 
-    private void checkFilteredFieldsHaveProtectedModifier() {
+    private void guaranteeFilteredFieldsHaveProtectedModifier() {
 	checkFieldsHaveProtectedModifier(fields);
 	checkFieldsHaveProtectedModifier(childFields);
     }
@@ -156,7 +156,7 @@ public class AnnotationExtractor {
 		throw new ProtectedModifierException();
     }
 
-    private void checkChildInfoMatchesChildFields() {
+    private void guaranteeChildInfoMatchesChildFields() {
 	if (container.childNode.isPresent())
 	    checkHasChildFields();
 	else

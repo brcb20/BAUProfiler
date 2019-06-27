@@ -71,14 +71,14 @@ public class AnnotationExtractorTest {
     public void testExtractionOfCustomJClassAnnotationPath() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.CustomJClassAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass("
-		    , "  path=\"my/test/path\""
-		    , ")"
-		    , "public class CustomJClassAnnotation {"
-		    , "  @JField protected String requiresAtLeastOneField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass("
+		, "  path=\"my/test/path\""
+		, ")"
+		, "public class CustomJClassAnnotation {"
+		, "  @JField protected String requiresAtLeastOneField;"
+		, "}");
 
 	assertThat(container).hadMatchingPrefixes("my", "test", "path");
     }
@@ -87,15 +87,15 @@ public class AnnotationExtractorTest {
     public void testExtractionOfCustomJClassAnnotationType() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.CustomJClassAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.core.JType;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass("
-		    , "  type=JType.OBJECT_ARRAY"
-		    , ")"
-		    , "public class CustomJClassAnnotation {"
-		    , "  @JField protected String requiresAtLeastOneField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.core.JType;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass("
+		, "  type=JType.OBJECT_ARRAY"
+		, ")"
+		, "public class CustomJClassAnnotation {"
+		, "  @JField protected String requiresAtLeastOneField;"
+		, "}");
 
 	assertThat(container).hadMatchingType(JType.OBJECT_ARRAY);
     }
@@ -104,13 +104,13 @@ public class AnnotationExtractorTest {
     public void testExtractionOfChildAnnotation() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.ChildAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass(path=\"my/test/path\")"
-		    , "@Child(key=\"child\")"
-		    , "public class ChildAnnotation {"
-		    , "  @JField @ChildField protected String requiresAtLeastOneChildField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass(path=\"my/test/path\")"
+		, "@Child(key=\"child\")"
+		, "public class ChildAnnotation {"
+		, "  @JField @ChildField protected String requiresAtLeastOneChildField;"
+		, "}");
 
 	assertThat(container).hadChildAnnotation();
     }
@@ -119,13 +119,13 @@ public class AnnotationExtractorTest {
     public void testExtractionOfChildAnnotationKey() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.ChildAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass(path=\"my/test/path\")"
-		    , "@Child(key=\"child\")"
-		    , "public class ChildAnnotation {"
-		    , "  @JField @ChildField protected String requiresAtLeastOneChildField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass(path=\"my/test/path\")"
+		, "@Child(key=\"child\")"
+		, "public class ChildAnnotation {"
+		, "  @JField @ChildField protected String requiresAtLeastOneChildField;"
+		, "}");
 
 	assertThat(container).hadMatchingChildPrefix("child");
     }
@@ -134,13 +134,13 @@ public class AnnotationExtractorTest {
     public void testExtractionOfDefaultChildAnnotationType() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.ChildAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass(path=\"my/test/path\")"
-		    , "@Child(key=\"child\")"
-		    , "public class ChildAnnotation {"
-		    , "  @JField @ChildField protected String requiresAtLeastOneChildField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass(path=\"my/test/path\")"
+		, "@Child(key=\"child\")"
+		, "public class ChildAnnotation {"
+		, "  @JField @ChildField protected String requiresAtLeastOneChildField;"
+		, "}");
 
 	assertThat(container).hadDefaultChildType();
     }
@@ -149,13 +149,13 @@ public class AnnotationExtractorTest {
     public void testExtractionOfChildAnnotationWithNoChildFields() {
 	JsonContainer container = extractContainerForSourceLines(
 		"test.ChildAnnotation"
-		    , "package test;"
-		    , "import uk.ac.manchester.bauprofiler.json.annotations.*;"
-		    , "@JClass(path=\"my/test/path\")"
-		    , "@Child(key=\"child\")"
-		    , "public class ChildAnnotation {"
-		    , "  @JField protected String requiresAtLeastOneChildField;"
-		    , "}");
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.*;"
+		, "@JClass(path=\"my/test/path\")"
+		, "@Child(key=\"child\")"
+		, "public class ChildAnnotation {"
+		, "  @JField protected String requiresAtLeastOneChildField;"
+		, "}");
     }
 
     @Test
