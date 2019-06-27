@@ -50,14 +50,14 @@ public class OrderedProfileQueue {
 
     public static final class Builder {
         private final Deque<ConvertableProfile> profiles = new LinkedList<>();
-        private final HashMap<Class, Deque<ConvertableProfile>> profilesWithDeps =
-            new HashMap<>();
+        private final HashMap<Class<ConvertableProfile>, Deque<ConvertableProfile>>
+            profilesWithDeps = new HashMap<>();
         private final List<ConvertableProfile> orderedProfiles = new LinkedList<>();
 
         private Builder() {}
 
         public void insert(ConvertableProfile profile) {
-            Class dependency = profile.depends();
+            Class<ConvertableProfile> dependency = profile.depends();
             if (dependency == null)
                 profiles.add(profile);
             else

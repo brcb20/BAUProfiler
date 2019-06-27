@@ -36,9 +36,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.DeclaredType;
 
+import uk.ac.manchester.bauprofiler.core.Profile;
+import uk.ac.manchester.bauprofiler.core.interfaces.Dependency;
+
 public class ProfileExtractor {
-    private static final String PROFILE_FULLY_QUALIFIED_NAME =
-	"uk.ac.manchester.bauprofiler.core.Profile";
+    private static final String PROFILE_FULLY_QUALIFIED_NAME = Profile.class.getName();
+    private static final String DEPENDENCY_FULLY_QUALIFIED_NAME = Dependency.class.getName();
     private TypeElement enclosingElement;
     private DeclaredType profile;
     private ProfileContainer container;
@@ -54,25 +57,28 @@ public class ProfileExtractor {
 
     private ProfileContainer extractIntoContainer() {
 	findProfileImplementation();
-	checkImplementsProfile();
+	guaranteeImplementsProfile();
 	populateEnclosingElement();
 	populatePackageName();
 	populateClassName();
-	populateProfileGenericName();
+	populateDependencyName();
 	populateConstructors();
 	return container;
     }
 
     private void findProfileImplementation() {
-        List<? extends TypeMirror> interfaces = enclosingElement.getInterfaces();
-	for (TypeMirror itf : interfaces)
-	    if (itf.toString().startsWith(PROFILE_FULLY_QUALIFIED_NAME)) {
-		profile = (DeclaredType) itf;
-		break;
-	    }
+	profile = findImplementation(PROFILE_FULLY_QUALIFIED_NAME);
     }
 
-    private void checkImplementsProfile() {
+    private DeclaredType findImplementation(String fullyQualifiedName) {
+        List<? extends TypeMirror> interfaces = enclosingElement.getInterfaces();
+	for (TypeMirror itf : interfaces)
+	    if (itf.toString().startsWith(fullyQualifiedName))
+		return (DeclaredType) itf;
+	return null;
+    }
+
+    private void guaranteeImplementsProfile() {
 	if (profile == null)
 	    throw new ProfileUnimplementedException();
     }
@@ -90,10 +96,28 @@ public class ProfileExtractor {
 	container.className = enclosingElement.getSimpleName().toString();
     }
 
-    private void populateProfileGenericName() {
-	List<? extends TypeMirror> typeArgs = profile.getTypeArguments();
-	container.fullyQualifiedTypeArgName =
-	    (typeArgs.isEmpty()) ? Optional.empty() : Optional.of(typeArgs.get(0).toString());
+    private void populateDependencyName() {
+	DeclaredType dependency = findImplementation(DEPENDENCY_FULLY_QUALIFIED_NAME);
+	if (dependency == null)
+	    setEmptyDependencyName();
+	else
+	    setDependencyNameFromTypeParam(dependency);
+    }
+
+    public void setEmptyDependencyName() {
+	container.fullyQualifiedDependencyName = Optional.empty();
+    }
+
+    public void setDependencyNameFromTypeParam(DeclaredType dependency) {
+	List<? extends TypeMirror> typeArguments = dependency.getTypeArguments();
+	if (typeArguments.isEmpty())
+	    throw new DependencyRawTypeParameterException();
+	container.fullyQualifiedDependencyName = Optional.of(
+		getOnlyTypeArgument(typeArguments).toString());
+    }
+
+    private TypeMirror getOnlyTypeArgument(List<? extends TypeMirror> typeArguments) {
+	return typeArguments.get(0);
     }
 
     private void populateConstructors() {
@@ -102,4 +126,5 @@ public class ProfileExtractor {
     }
 
     public static class ProfileUnimplementedException extends RuntimeException {}
+    public static class DependencyRawTypeParameterException extends RuntimeException {}
 }

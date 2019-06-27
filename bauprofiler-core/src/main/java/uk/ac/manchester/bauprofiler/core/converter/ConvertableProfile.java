@@ -26,9 +26,10 @@
 package uk.ac.manchester.bauprofiler.core.converter;
 
 import uk.ac.manchester.bauprofiler.core.Profile;
+import uk.ac.manchester.bauprofiler.core.interfaces.Dependency;
 
-public interface ConvertableProfile<T extends Profile> extends Profile<T> {
-    default Class<? extends T> depends() { return null; }
+public interface ConvertableProfile extends Profile, Dependency {
+    Class<ConvertableProfile> depends();
     void setVerbosity(boolean verbose);
     Conversion convert();
 }

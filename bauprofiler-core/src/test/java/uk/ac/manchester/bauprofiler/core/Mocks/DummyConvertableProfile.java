@@ -30,6 +30,14 @@ import uk.ac.manchester.bauprofiler.core.converter.Conversion;
 import uk.ac.manchester.bauprofiler.core.assembler.AssemblyNode;
 
 public class DummyConvertableProfile implements ConvertableProfile {
+    public boolean predicate(Profile dep) {
+	return false;
+    }
+
+    public Class<ConvertableProfile> depends() {
+	return null;
+    }
+
     public void setVerbosity(boolean verbose) {
     }
 

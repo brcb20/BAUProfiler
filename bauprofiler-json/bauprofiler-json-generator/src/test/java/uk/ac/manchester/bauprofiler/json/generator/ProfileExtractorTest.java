@@ -59,20 +59,49 @@ public class ProfileExtractorTest {
     }
 
     @Test
-    public void testExtractionOfProfileTypeArg() {
+    public void testExtractionOfDependencyName() {
 	ProfileContainer container = extractContainerForSourceLines(
-		"test.ProfileImplWithTypeArg"
+		"test.ProfileImplWithDependency"
 		, "package test;"
 		, "import uk.ac.manchester.bauprofiler.json.annotations.JClass;"
 		, "import uk.ac.manchester.bauprofiler.core.Profile;"
+		, "import uk.ac.manchester.bauprofiler.core.interfaces.Dependency;"
 		, "import uk.ac.manchester.bauprofiler.json.generator.DummyProfileImpl;"
 		, "@JClass"
-		, "public class ProfileImplWithTypeArg implements Profile<DummyProfileImpl> {"
+		, "public class ProfileImplWithDependency"
+		    + " implements Profile, Dependency<DummyProfileImpl> {"
 		, "}");
 
-	assertTrue(container.fullyQualifiedTypeArgName.isPresent());
-	assertThat(container.fullyQualifiedTypeArgName.get()
+	assertTrue(container.fullyQualifiedDependencyName.isPresent());
+	assertThat(container.fullyQualifiedDependencyName.get()
 		, equalTo("uk.ac.manchester.bauprofiler.json.generator.DummyProfileImpl"));
+    }
+
+    @Test (expected=ProfileExtractor.DependencyRawTypeParameterException.class)
+    public void testExtractionOfDependencyName_whenDependencyHasNoTypeParameter() {
+	ProfileContainer container = extractContainerForSourceLines(
+		"test.ProfileImplWithRawDependency"
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.JClass;"
+		, "import uk.ac.manchester.bauprofiler.core.Profile;"
+		, "import uk.ac.manchester.bauprofiler.core.interfaces.Dependency;"
+		, "@JClass"
+		, "public class ProfileImplWithRawDependency implements Profile, Dependency {"
+		, "}");
+    }
+
+    @Test
+    public void testExtractionOfDependencyName_whenNoDependency() {
+	ProfileContainer container = extractContainerForSourceLines(
+		"test.ProfileImplWithNoDependency"
+		, "package test;"
+		, "import uk.ac.manchester.bauprofiler.json.annotations.JClass;"
+		, "import uk.ac.manchester.bauprofiler.core.Profile;"
+		, "@JClass"
+		, "public class ProfileImplWithNoDependency implements Profile {"
+		, "}");
+
+	assertFalse(container.fullyQualifiedDependencyName.isPresent());
     }
 
     @Test
