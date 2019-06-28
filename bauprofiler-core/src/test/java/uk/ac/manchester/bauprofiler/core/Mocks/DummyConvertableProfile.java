@@ -25,17 +25,23 @@
  */
 package uk.ac.manchester.bauprofiler.core;
 
+import java.util.Optional;
+
 import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 import uk.ac.manchester.bauprofiler.core.converter.Conversion;
 import uk.ac.manchester.bauprofiler.core.assembler.AssemblyNode;
 
 public class DummyConvertableProfile implements ConvertableProfile {
-    public boolean predicate(Profile dep) {
-	return false;
+    public int getId() {
+	return 0;
     }
 
-    public Class<ConvertableProfile> depends() {
-	return null;
+    public Optional<Integer> getDependencyId() {
+	return Optional.empty();
+    }
+
+    public boolean predicate(Profile dep) {
+	return false;
     }
 
     public void setVerbosity(boolean verbose) {

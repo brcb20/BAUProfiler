@@ -28,6 +28,7 @@ package uk.ac.manchester.bauprofiler.json.generator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.StringJoiner;
+import java.util.Optional;
 import java.time.LocalDateTime;
 
 import javax.lang.model.element.ExecutableElement;
@@ -36,6 +37,7 @@ import javax.lang.model.element.Modifier;
 import javax.annotation.Generated;
 
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -49,7 +51,7 @@ import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 public class SkeletonGenerator {
     private final String CLASS_NAME_PREFIX = "Generated";
     private final ClassName superinterface = ClassName.get(JsonConvertableProfile.class);
-    private ProfileContainer container;
+    private final ProfileContainer container;
 
     public SkeletonGenerator(ProfileContainer container) {
 	this.container = container;
@@ -71,8 +73,7 @@ public class SkeletonGenerator {
 
     private AnnotationSpec getGeneratedAnnotation() {
 	return AnnotationSpec.builder(Generated.class)
-	    .addMember("value", "$S"
-		    , CodeGenerator.class.getName())
+	    .addMember("value", "$S", CodeGenerator.class.getName())
 	    .addMember("date", "$S", LocalDateTime.now())
 	    .build();
     }
@@ -85,23 +86,42 @@ public class SkeletonGenerator {
 	return superinterface;
     }
 
-    private ClassName getPrefixedDependencyClass(String classNamePrefix) {
-	String fullyQualifiedName = container.fullyQualifiedDependencyName.get();
-	String packageName = extractPackageName(fullyQualifiedName);
-	String className = extractClassName(fullyQualifiedName);
-	return ClassName.get(
-		packageName.isEmpty() ? container.packageName : packageName
-		, classNamePrefix+className);
+    public FieldSpec[] getFields() {
+	List<FieldSpec> fields = new ArrayList<>();
+	fields.add(createIdField());
+	fields.add(createDependencyIdField());
+	return fields.toArray(new FieldSpec[fields.size()]);
     }
 
-    private String extractPackageName(String fullyQualifiedName) {
-	int lastDot = fullyQualifiedName.lastIndexOf('.');
-	return (lastDot == -1) ? "" : fullyQualifiedName.substring(0, lastDot);
+    private FieldSpec createIdField() {
+	return FieldSpec.builder(TypeName.INT, "_id")
+	    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+	    .initializer("$L", container.classId)
+	    .build();
     }
 
-    private String extractClassName(String fullyQualifiedName) {
-	int lastDot = fullyQualifiedName.lastIndexOf('.');
-	return (lastDot == -1) ? fullyQualifiedName : fullyQualifiedName.substring(lastDot+1);
+    private FieldSpec createDependencyIdField() {
+	return FieldSpec.builder(ParameterizedTypeName.get(
+		    ClassName.get(Optional.class), TypeName.INT.box()), "_dependencyId")
+	    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+	    .initializer(getDependencyIdInitializer())
+	    .build();
+    }
+
+    private CodeBlock getDependencyIdInitializer() {
+	return CodeBlock.of(getDependencyIdFormat(), getDependencyIdArgs());
+    }
+
+    private String getDependencyIdFormat() {
+	return container.dependencyId.isPresent() ? "$T.of($L)" : "$T.empty()";
+    }
+
+    private Object[] getDependencyIdArgs() {
+	List<Object> args = new ArrayList<>();
+	args.add(ParameterizedTypeName.get(ClassName.get(Optional.class), TypeName.INT.box()));
+	if (container.dependencyId.isPresent())
+	    args.add(container.dependencyId.get());
+	return args.toArray();
     }
 
     public MethodSpec[] getConstructors() {
@@ -124,40 +144,53 @@ public class SkeletonGenerator {
 
     public MethodSpec[] getMethods() {
 	List<MethodSpec> methods = new ArrayList<>();
-	methods.add(getDependsMethod());
-	if (!container.fullyQualifiedDependencyName.isPresent())
-	    methods.add(getDefaultPredicateMethod());
+	methods.add(getGetIdMethod());
+	methods.add(getGetDependencyIdMethod());
+	methods.add(getPredicateMethod());
 	return methods.toArray(new MethodSpec[methods.size()]);
     }
 
-    private MethodSpec getDependsMethod() {
-	return MethodSpec.methodBuilder("depends")
+    private MethodSpec getGetIdMethod() {
+	return MethodSpec.methodBuilder("getId")
 	    .addModifiers(Modifier.PUBLIC)
-	    .addStatement(getDependsMethodStatement())
-	    .returns(ParameterizedTypeName.get(ClassName.get(Class.class), ClassName.get(ConvertableProfile.class)))
+	    .addStatement("return _id")
+	    .returns(TypeName.INT)
 	    .build();
     }
 
-    private CodeBlock getDependsMethodStatement() {
-	return (container.fullyQualifiedDependencyName.isPresent())
-	    ? getCustomDependsMethodStatement()
-	    : getDefaultDependsMethodStatement();
+    private MethodSpec getGetDependencyIdMethod() {
+	return MethodSpec.methodBuilder("getDependencyId")
+	    .addModifiers(Modifier.PUBLIC)
+	    .addStatement("return _dependencyId")
+	    .returns(ParameterizedTypeName.get(ClassName.get(Optional.class), TypeName.INT.box()))
+	    .build();
     }
 
-    private CodeBlock getCustomDependsMethodStatement() {
-	return CodeBlock.of("return $T.class", getPrefixedDependencyClass(CLASS_NAME_PREFIX));
-    }
-
-    private CodeBlock getDefaultDependsMethodStatement() {
-	return CodeBlock.of("return null");
-    }
-
-    private MethodSpec getDefaultPredicateMethod() {
+    private MethodSpec getPredicateMethod() {
 	return MethodSpec.methodBuilder("predicate")
 	    .addModifiers(Modifier.PUBLIC)
 	    .addParameter(ClassName.get(Profile.class), "dep")
-	    .addStatement("return false")
+	    .addCode(getPredicateStatement())
 	    .returns(TypeName.BOOLEAN)
 	    .build();
+    }
+
+    private CodeBlock getPredicateStatement() {
+	return (container.fullyQualifiedDependencyName.isPresent())
+	    ? getCustomPredicateStatement() : getDefaultPredicateStatement();
+    }
+
+    private CodeBlock getCustomPredicateStatement() {
+	ClassName dependency = ClassName.bestGuess(container.fullyQualifiedDependencyName.get());
+	return CodeBlock.builder()
+	    .beginControlFlow("if (dep instanceof $T.class)", dependency)
+	    .addStatement("return super.predicate(($T) dep)", dependency)
+	    .endControlFlow()
+	    .addStatement("return false")
+	    .build();
+    }
+
+    private CodeBlock getDefaultPredicateStatement() {
+	return CodeBlock.builder().addStatement("return false").build();
     }
 }

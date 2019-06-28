@@ -33,6 +33,8 @@ public class ProfileContainer {
     TypeElement enclosingElement;
     String packageName;
     String className;
+    int classId;
     Optional<String> fullyQualifiedDependencyName;
+    Optional<Integer> dependencyId;
     ExecutableElement[] constructors;
 }

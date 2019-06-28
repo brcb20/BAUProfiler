@@ -44,7 +44,7 @@ public class ProfileExtractorTest {
 	    .compile(JavaFileObjects.forSourceLines(fullyQualifiedName, lines));
 
 	return ProfileExtractor.extract(
-		processor.annotatedElements.toArray(new TypeElement[1])[0]);
+		processor.annotatedElements.toArray(new TypeElement[1])[0], new DummyEncoder());
     }
 
     @Test (expected=ProfileExtractor.ProfileUnimplementedException.class)

@@ -41,6 +41,8 @@ import com.google.common.collect.ImmutableSet;
 import uk.ac.manchester.bauprofiler.json.annotations.JClass;
 
 public class AnnotationProcessor extends AbstractProcessor {
+    private static final String PREFIX_ENCODING_FILENAME = "./.prefix_encoding.so";
+    private static final String PROFILE_ENCODING_FILENAME = "./.profile_encoding.so";
     private Filer filer;
 
     @Override
@@ -53,29 +55,28 @@ public class AnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<TypeElement> annotatedElements = (Set<TypeElement>)roundEnv
             .getElementsAnnotatedWith(JClass.class);
-	PersistentEncoder encoder = loadEncoder();
+	PersistentEncoder prefixEncoder = loadEncoder(PREFIX_ENCODING_FILENAME);
+	PersistentEncoder profileEncoder = loadEncoder(PROFILE_ENCODING_FILENAME);
 	for (TypeElement elem : annotatedElements)
-	    writeToFiler(generateCode(elem, encoder));
-	persistEncoder(encoder);
+	    writeToFiler(generateCode(elem, prefixEncoder, profileEncoder));
+	persistEncoder(prefixEncoder);
+	persistEncoder(profileEncoder);
 	return true;
     }
 
-    private PersistentEncoder loadEncoder() {
+    private PersistentEncoder loadEncoder(String filename) {
 	try {
-	    return PersistentEncoder.load();
+	    return PersistentEncoder.load(filename);
 	} catch (ClassNotFoundException | IOException e) {
 	    throw new RuntimeException(e);
 	}
     }
 
-    private CodeGenerator generateCode(TypeElement element, Encoder encoder) {
+    private CodeGenerator generateCode(
+	    TypeElement element, Encoder prefixEncoder, Encoder profileEncoder) {
 	return CodeGenerator.build(
-		new SkeletonGenerator(
-		    ProfileExtractor.extract(element))
-		, new BodyGenerator(
-		    AnnotationExtractor.extract(element)
-		    , encoder)
-		);
+		new SkeletonGenerator(ProfileExtractor.extract(element, profileEncoder))
+		, new BodyGenerator(AnnotationExtractor.extract(element), prefixEncoder));
     }
 
     private void writeToFiler(CodeGenerator codeGenerator) {

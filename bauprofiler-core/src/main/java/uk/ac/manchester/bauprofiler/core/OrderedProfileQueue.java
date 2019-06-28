@@ -30,6 +30,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collections;
+import java.util.Optional;
 
 import uk.ac.manchester.bauprofiler.core.converter.ConvertableProfile;
 
@@ -50,25 +51,25 @@ public class OrderedProfileQueue {
 
     public static final class Builder {
         private final Deque<ConvertableProfile> profiles = new LinkedList<>();
-        private final HashMap<Class<ConvertableProfile>, Deque<ConvertableProfile>>
-            profilesWithDeps = new HashMap<>();
+        private final HashMap<Integer, Deque<ConvertableProfile>> profilesWithDeps =
+            new HashMap<>();
         private final List<ConvertableProfile> orderedProfiles = new LinkedList<>();
 
         private Builder() {}
 
         public void insert(ConvertableProfile profile) {
-            Class<ConvertableProfile> dependency = profile.depends();
-            if (dependency == null)
-                profiles.add(profile);
+            Optional<Integer> dependencyId = profile.getDependencyId();
+            if (dependencyId.isPresent())
+                insertProfileWithDep(profile, dependencyId.get());
             else
-                insertProfileWithDep(profile, dependency);
+                profiles.add(profile);
         }
 
-        private void insertProfileWithDep(ConvertableProfile profile, Class dependency) {
-            Deque<ConvertableProfile> profilesWithSameDep = profilesWithDeps.get(dependency);
+        private void insertProfileWithDep(ConvertableProfile profile, Integer dependencyId) {
+            Deque<ConvertableProfile> profilesWithSameDep = profilesWithDeps.get(dependencyId);
             if (profilesWithSameDep == null) {
                 profilesWithSameDep = new LinkedList<ConvertableProfile>();
-                profilesWithDeps.put(dependency, profilesWithSameDep);
+                profilesWithDeps.put(dependencyId, profilesWithSameDep);
             }
             profilesWithSameDep.add(profile);
         }
@@ -81,7 +82,7 @@ public class OrderedProfileQueue {
         private void orderProfiles() {
             while (profiles.size() > 0) {
                 ConvertableProfile profile = profiles.removeFirst();
-                Deque<ConvertableProfile> dependents = profilesWithDeps.get(profile.getClass());
+                Deque<ConvertableProfile> dependents = profilesWithDeps.get(profile.getId());
                 if (dependents != null
                         && dependents.size() != 0
                         && dependents.peek().predicate(profile))

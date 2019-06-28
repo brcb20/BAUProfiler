@@ -60,13 +60,15 @@ public class CodeGenerator {
 	    .addSuperinterface(skeleton.getSuperInterface());
 	for (AnnotationSpec as : skeleton.getAnnotations())
 	    builder.addAnnotation(as);
+	for (FieldSpec fs : skeleton.getFields())
+	    builder.addField(fs);
 	for (FieldSpec fs : body.getFields())
 	    builder.addField(fs);
 	for (MethodSpec ms : skeleton.getConstructors())
 	    builder.addMethod(ms);
-	for (MethodSpec ms : body.getMethods())
-	    builder.addMethod(ms);
 	for (MethodSpec ms : skeleton.getMethods())
+	    builder.addMethod(ms);
+	for (MethodSpec ms : body.getMethods())
 	    builder.addMethod(ms);
 	javaFile = JavaFile.builder(skeleton.getPackageName(), builder.build())
 	    .skipJavaLangImports(true)
