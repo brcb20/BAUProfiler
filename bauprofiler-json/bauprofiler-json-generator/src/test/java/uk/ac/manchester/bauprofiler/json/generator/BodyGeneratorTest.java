@@ -380,7 +380,7 @@ public class BodyGeneratorTest {
 	assertThat(convert.get().toString(), equalTo(
 		    "public "+FULLY_QUALIFIED_NAME_CONVERSION+" convert() {\n"
 		    + "  return new "+JSON_GENERATOR_PACKAGE+".JsonConversion("
-		    + "0, getJson(), _assemblyNodes);\n"
+		    + "getId(), getJson(), _assemblyNodes);\n"
 		    + "}\n"));
     }
 }

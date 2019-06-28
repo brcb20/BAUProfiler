@@ -25,11 +25,14 @@
  */
 package uk.ac.manchester.bauprofiler.core.converter;
 
-import uk.ac.manchester.bauprofiler.core.Profile;
-import uk.ac.manchester.bauprofiler.core.interfaces.Dependency;
+import java.util.Optional;
 
-public interface ConvertableProfile extends Profile, Dependency {
-    Class<ConvertableProfile> depends();
+import uk.ac.manchester.bauprofiler.core.Profile;
+
+public interface ConvertableProfile extends Profile {
+    int getId();
+    Optional<Integer> getDependencyId();
+    boolean predicate(Profile dep);
     void setVerbosity(boolean verbose);
     Conversion convert();
 }

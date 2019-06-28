@@ -32,19 +32,14 @@ import java.io.Serializable;
 public class EncoderImpl implements Encoder, Serializable {
     //private static final long serialVersionUID = 
     private Map<String, Integer> encoder = new HashMap<>();
-    private int nextConversionID = 0;
-    private int nextPrefixCode = 0;
+    private int nextCode = 0;
 
-    public int encodePrefix(String in) {
+    public int encode(String in) {
         Integer out = encoder.get(in);
         if (out == null) {
-            out = nextPrefixCode++;
+            out = nextCode++;
             encoder.put(in, out);
         }
         return out;
-    }
-
-    public int nextConversionID() {
-	return nextConversionID++;
     }
 }

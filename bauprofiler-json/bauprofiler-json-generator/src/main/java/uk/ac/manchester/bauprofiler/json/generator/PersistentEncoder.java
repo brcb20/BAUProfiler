@@ -33,14 +33,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class PersistentEncoder implements Encoder {
-    private static final String filename = "./etc/persistent_encoding.so";
-    private EncoderImpl impl;
+    private final String filename;
+    private final EncoderImpl impl;
 
-    private PersistentEncoder(EncoderImpl impl) {
+    private PersistentEncoder(EncoderImpl impl, String filename) {
 	this.impl = impl;
+	this.filename = filename;
     }
 
-    public static PersistentEncoder load() throws ClassNotFoundException, IOException {
+    public static PersistentEncoder load(String filename)
+	    throws ClassNotFoundException, IOException {
 	EncoderImpl impl = null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
             impl = (EncoderImpl) ois.readObject();
@@ -51,7 +53,7 @@ public class PersistentEncoder implements Encoder {
         if (impl == null)
 	    impl = new EncoderImpl();
 
-	return new PersistentEncoder(impl);
+	return new PersistentEncoder(impl, filename);
     }
 
     public void persist() throws IOException {
@@ -61,12 +63,7 @@ public class PersistentEncoder implements Encoder {
 	}
     }
 
-    public int encodePrefix(String in) {
-	return impl.encodePrefix(in);
-    }
-
-    public int nextConversionID() {
-	return impl.nextConversionID();
+    public int encode(String in) {
+	return impl.encode(in);
     }
 }
-

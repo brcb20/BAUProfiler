@@ -26,11 +26,7 @@
 package uk.ac.manchester.bauprofiler.json.generator;
 
 public class DummyEncoder implements Encoder {
-    public int encodePrefix(String in) {
-	return 0;
-    }
-
-    public int nextConversionID() {
+    public int encode(String in) {
 	return 0;
     }
 }

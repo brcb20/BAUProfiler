@@ -26,7 +26,6 @@
 package uk.ac.manchester.bauprofiler.json.generator;
 
 public interface Encoder {
-    int encodePrefix(String in);
-    int nextConversionID();
+    int encode(String in);
 }
 

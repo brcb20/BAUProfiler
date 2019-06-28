@@ -45,14 +45,17 @@ public class ProfileExtractor {
     private TypeElement enclosingElement;
     private DeclaredType profile;
     private ProfileContainer container;
+    private Encoder classNameEncoder;
 
-    public static ProfileContainer extract(TypeElement enclosingElement) {
-	return new ProfileExtractor(enclosingElement).extractIntoContainer();
+    public static ProfileContainer extract(
+	    TypeElement enclosingElement, Encoder classNameEncoder) {
+	return new ProfileExtractor(enclosingElement, classNameEncoder).extractIntoContainer();
     }
 
-    private ProfileExtractor(TypeElement enclosingElement) {
+    private ProfileExtractor(TypeElement enclosingElement, Encoder classNameEncoder) {
 	container = new ProfileContainer();
 	this.enclosingElement = enclosingElement;
+	this.classNameEncoder = classNameEncoder;
     }
 
     private ProfileContainer extractIntoContainer() {
@@ -61,7 +64,8 @@ public class ProfileExtractor {
 	populateEnclosingElement();
 	populatePackageName();
 	populateClassName();
-	populateDependencyName();
+	populateClassId();
+	populateDependency();
 	populateConstructors();
 	return container;
     }
@@ -96,24 +100,51 @@ public class ProfileExtractor {
 	container.className = enclosingElement.getSimpleName().toString();
     }
 
-    private void populateDependencyName() {
+    private void populateClassId() {
+	container.classId = classNameEncoder.encode(getFullyQualifiedClassName());
+    }
+
+    private String getFullyQualifiedClassName() {
+	return container.packageName+"."+container.className;
+    }
+
+    private void populateDependency() {
 	DeclaredType dependency = findImplementation(DEPENDENCY_FULLY_QUALIFIED_NAME);
 	if (dependency == null)
-	    setEmptyDependencyName();
+	    setEmptyDependency();
 	else
-	    setDependencyNameFromTypeParam(dependency);
+	    setDependencyFromTypeParam(dependency);
     }
 
-    public void setEmptyDependencyName() {
+    public void setEmptyDependency() {
 	container.fullyQualifiedDependencyName = Optional.empty();
+	container.dependencyId = Optional.empty();
     }
 
-    public void setDependencyNameFromTypeParam(DeclaredType dependency) {
+    public void setDependencyFromTypeParam(DeclaredType dependency) {
 	List<? extends TypeMirror> typeArguments = dependency.getTypeArguments();
 	if (typeArguments.isEmpty())
 	    throw new DependencyRawTypeParameterException();
-	container.fullyQualifiedDependencyName = Optional.of(
-		getOnlyTypeArgument(typeArguments).toString());
+	container.fullyQualifiedDependencyName = Optional.of(getFullyQualifiedDependencyClassName(
+			getOnlyTypeArgument(typeArguments).toString()));
+	container.dependencyId = Optional.of(classNameEncoder.encode(
+		    container.fullyQualifiedDependencyName.get()));
+    }
+
+    private String getFullyQualifiedDependencyClassName(String dependencyClassName) {
+	String packageName = extractPackageName(dependencyClassName);
+	String className = extractClassName(dependencyClassName);
+	return packageName.isEmpty() ? container.packageName+"."+className : dependencyClassName;
+    }
+
+    private String extractPackageName(String fullyQualifiedName) {
+	int lastDot = fullyQualifiedName.lastIndexOf('.');
+	return (lastDot == -1) ? "" : fullyQualifiedName.substring(0, lastDot);
+    }
+
+    private String extractClassName(String fullyQualifiedName) {
+	int lastDot = fullyQualifiedName.lastIndexOf('.');
+	return (lastDot == -1) ? fullyQualifiedName : fullyQualifiedName.substring(lastDot+1);
     }
 
     private TypeMirror getOnlyTypeArgument(List<? extends TypeMirror> typeArguments) {

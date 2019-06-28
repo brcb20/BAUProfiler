@@ -44,11 +44,11 @@ import uk.ac.manchester.bauprofiler.core.converter.Conversion;
 
 public class BodyGenerator {
     private JsonContainer container;
-    private Encoder encoder;
+    private Encoder prefixEncoder;
 
-    public BodyGenerator(JsonContainer container, Encoder encoder) {
+    public BodyGenerator(JsonContainer container, Encoder prefixEncoder) {
 	this.container = container;
-	this.encoder = encoder;
+	this.prefixEncoder = prefixEncoder;
     }
 
     public FieldSpec[] getFields() {
@@ -95,7 +95,7 @@ public class BodyGenerator {
 	return Arrays.asList(
 		getNodeClassForType(type)
 		, escape(container.prefixes[nodeIndex])
-		, encoder.encodePrefix(container.prefixes[nodeIndex]));
+		, prefixEncoder.encode(container.prefixes[nodeIndex]));
     }
 
     private String escape(String unescaped) {
@@ -108,7 +108,7 @@ public class BodyGenerator {
 		ChildNode.class
 		, childNode.getClass()
 		, ""
-		, encoder.encodePrefix(childNode.prefix()));
+		, prefixEncoder.encode(childNode.prefix()));
     }
 
     private Class<? extends BaseNode> getNodeClassForType(JType type) {
@@ -218,11 +218,11 @@ public class BodyGenerator {
 
     public MethodSpec[] getMethods() {
 	List<MethodSpec> methods = new ArrayList<>();
-	methods.add(createGetJsonIncludeInvisible());
-	methods.add(createGetJsonExcludeInvisible());
-	methods.add(createGetJson());
 	methods.add(createSetVerbosityMethod());
 	methods.add(createConvertMethod());
+	methods.add(createGetJson());
+	methods.add(createGetJsonIncludeInvisible());
+	methods.add(createGetJsonExcludeInvisible());
 	return methods.toArray(new MethodSpec[methods.size()]);
     }
 
@@ -291,7 +291,7 @@ public class BodyGenerator {
     }
 
     private String getConvertStatementFormat() {
-	return "return new $T("+encoder.nextConversionID()+", getJson(), _assemblyNodes)";
+	return "return new $T(getId(), getJson(), _assemblyNodes)";
     }
 
     private Object[] getConvertStatementArgs() {
