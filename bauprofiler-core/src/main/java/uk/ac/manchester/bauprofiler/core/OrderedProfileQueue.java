@@ -85,7 +85,7 @@ public class OrderedProfileQueue {
                 Deque<ConvertableProfile> dependents = profilesWithDeps.get(profile.getId());
                 if (dependents != null
                         && dependents.size() != 0
-                        && dependents.peek().predicate(profile))
+                        && dependents.peek().dependsOn(profile))
                     profiles.addFirst(dependents.removeFirst());
                 orderedProfiles.add(profile);
             }

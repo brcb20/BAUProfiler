@@ -32,7 +32,7 @@ import uk.ac.manchester.bauprofiler.core.Profile;
 public interface ConvertableProfile extends Profile {
     int getId();
     Optional<Integer> getDependencyId();
-    boolean predicate(Profile dep);
+    boolean dependsOn(Profile dep);
     void setVerbosity(boolean verbose);
     Conversion convert();
 }

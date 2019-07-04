@@ -40,7 +40,7 @@ public class DummyConvertableProfile implements ConvertableProfile {
 	return Optional.empty();
     }
 
-    public boolean predicate(Profile dep) {
+    public boolean dependsOn(Profile dep) {
 	return false;
     }
 
