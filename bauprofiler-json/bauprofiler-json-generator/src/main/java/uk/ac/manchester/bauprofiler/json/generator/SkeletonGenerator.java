@@ -118,7 +118,7 @@ public class SkeletonGenerator {
 
     private Object[] getDependencyIdArgs() {
 	List<Object> args = new ArrayList<>();
-	args.add(ParameterizedTypeName.get(ClassName.get(Optional.class), TypeName.INT.box()));
+	args.add(ClassName.get(Optional.class));
 	if (container.dependencyId.isPresent())
 	    args.add(container.dependencyId.get());
 	return args.toArray();
@@ -146,7 +146,7 @@ public class SkeletonGenerator {
 	List<MethodSpec> methods = new ArrayList<>();
 	methods.add(getGetIdMethod());
 	methods.add(getGetDependencyIdMethod());
-	methods.add(getPredicateMethod());
+	methods.add(getDependsOnMethod());
 	return methods.toArray(new MethodSpec[methods.size()]);
     }
 
@@ -166,31 +166,31 @@ public class SkeletonGenerator {
 	    .build();
     }
 
-    private MethodSpec getPredicateMethod() {
-	return MethodSpec.methodBuilder("predicate")
+    private MethodSpec getDependsOnMethod() {
+	return MethodSpec.methodBuilder("dependsOn")
 	    .addModifiers(Modifier.PUBLIC)
 	    .addParameter(ClassName.get(Profile.class), "dep")
-	    .addCode(getPredicateStatement())
+	    .addCode(getDependsOnStatement())
 	    .returns(TypeName.BOOLEAN)
 	    .build();
     }
 
-    private CodeBlock getPredicateStatement() {
+    private CodeBlock getDependsOnStatement() {
 	return (container.fullyQualifiedDependencyName.isPresent())
-	    ? getCustomPredicateStatement() : getDefaultPredicateStatement();
+	    ? getCustomDependsOnStatement() : getDefaultDependsOnStatement();
     }
 
-    private CodeBlock getCustomPredicateStatement() {
+    private CodeBlock getCustomDependsOnStatement() {
 	ClassName dependency = ClassName.bestGuess(container.fullyQualifiedDependencyName.get());
 	return CodeBlock.builder()
-	    .beginControlFlow("if (dep instanceof $T.class)", dependency)
+	    .beginControlFlow("if (dep instanceof $T)", dependency)
 	    .addStatement("return super.predicate(($T) dep)", dependency)
 	    .endControlFlow()
 	    .addStatement("return false")
 	    .build();
     }
 
-    private CodeBlock getDefaultPredicateStatement() {
+    private CodeBlock getDefaultDependsOnStatement() {
 	return CodeBlock.builder().addStatement("return false").build();
     }
 }
