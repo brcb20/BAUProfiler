@@ -53,6 +53,8 @@ public class OrderedProfileQueue {
         private final Deque<ConvertableProfile> profiles = new LinkedList<>();
         private final HashMap<Integer, Deque<ConvertableProfile>> profilesWithDeps =
             new HashMap<>();
+        private final HashMap<Integer, Deque<ConvertableProfile>> profilesWithSelfDeps =
+            new HashMap<>();
         private final List<ConvertableProfile> orderedProfiles = new LinkedList<>();
 
         private Builder() {}
@@ -60,16 +62,36 @@ public class OrderedProfileQueue {
         public void insert(ConvertableProfile profile) {
             Optional<Integer> dependencyId = profile.getDependencyId();
             if (dependencyId.isPresent())
-                insertProfileWithDep(profile, dependencyId.get());
+                insertDependentProfile(profile, dependencyId.get());
             else
                 profiles.add(profile);
         }
 
-        private void insertProfileWithDep(ConvertableProfile profile, Integer dependencyId) {
-            Deque<ConvertableProfile> profilesWithSameDep = profilesWithDeps.get(dependencyId);
+        private void insertDependentProfile(ConvertableProfile profile, Integer dependencyId) {
+            if (isSelfReferentialDep(profile, dependencyId))
+                insertProfileWithSelfDep(profile, dependencyId);
+            else
+                insertProfileAsDependent(profile, profilesWithDeps, dependencyId);
+        }
+
+        private boolean isSelfReferentialDep(ConvertableProfile profile, Integer dependencyId) {
+            return profile.getId() == dependencyId;
+        }
+
+        private void insertProfileWithSelfDep(ConvertableProfile profile, Integer dependencyId) {
+            if (!profilesWithSelfDeps.containsKey(dependencyId))
+                profiles.add(new ConvertableProfilePlaceholder(dependencyId));
+            insertProfileAsDependent(profile, profilesWithSelfDeps, dependencyId);
+        }
+
+        private void insertProfileAsDependent(
+                ConvertableProfile profile
+                , HashMap<Integer, Deque<ConvertableProfile>> dependencyMap
+                , Integer dependencyId) {
+            Deque<ConvertableProfile> profilesWithSameDep = dependencyMap.get(dependencyId);
             if (profilesWithSameDep == null) {
                 profilesWithSameDep = new LinkedList<ConvertableProfile>();
-                profilesWithDeps.put(dependencyId, profilesWithSameDep);
+                dependencyMap.put(dependencyId, profilesWithSameDep);
             }
             profilesWithSameDep.add(profile);
         }
@@ -81,14 +103,29 @@ public class OrderedProfileQueue {
 
         private void orderProfiles() {
             while (profiles.size() > 0) {
-                ConvertableProfile profile = profiles.removeFirst();
-                Deque<ConvertableProfile> dependents = profilesWithDeps.get(profile.getId());
-                if (dependents != null
-                        && dependents.size() != 0
-                        && dependents.peek().dependsOn(profile))
-                    profiles.addFirst(dependents.removeFirst());
-                orderedProfiles.add(profile);
+                if (profiles.getFirst() instanceof ConvertableProfilePlaceholder) {
+                    orderAllProfilesAndDeps(profilesWithSelfDeps.get(
+                                profiles.removeFirst().getId()));
+                    continue;
+                }
+                orderSingleProfileAndDep(profiles);
             }
+        }
+
+        private void orderAllProfilesAndDeps(Deque<ConvertableProfile> currentProfiles) {
+            while (currentProfiles.size() > 0) {
+                orderSingleProfileAndDep(currentProfiles);
+            }
+        }
+
+        private void orderSingleProfileAndDep(Deque<ConvertableProfile> currentProfiles) {
+            ConvertableProfile profile = currentProfiles.removeFirst();
+            Deque<ConvertableProfile> dependents = profilesWithDeps.get(profile.getId());
+            if (dependents != null
+                    && dependents.size() != 0
+                    && dependents.peek().dependsOn(profile))
+                currentProfiles.addFirst(dependents.removeFirst());
+            orderedProfiles.add(profile);
         }
     }
 }
